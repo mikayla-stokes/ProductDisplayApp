@@ -20,18 +20,33 @@
       height: auto;
     }
 
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+
   </style>
 </head>
 <body>
   <div id="product-list"></div>
+  <div id="error-message" class="error" style="display: none;">Failed to load product data.</div>
 
   <script>
+    const productList = document.getElementById('product-list');
+    const errorMessage = document.getElementById('error-message');
+
     // Fetch data from API endpoint
     fetch('https://course-api.com/react-store-products')
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch product data.');
+        }
+        return response.json();
+      })
       .then(data => {
-        const productList = document.getElementById('product-list');
-
+        // Clear error message if data successfully fetched
+        errorMessage.style.display = 'none';
+        
         // Display each product
         data.forEach(product => {
           const productElement = document.createElement('div');
@@ -60,6 +75,11 @@
 
           productList.appendChild(productElement);
         });
+      });
+      .catch(error => {
+        // Display error message
+        console.error('Error fetching product data:', error);
+        errorMessage.style.display = 'block';
       });
   </script>
 </body>
