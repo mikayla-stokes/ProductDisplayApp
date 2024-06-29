@@ -31,8 +31,29 @@
       align-items: center;
       height: 100vh;
     }
+    
     .loading p {
       font-size: 24px;
+    }
+
+    .navigation {
+      margin-top: 20px;
+      text-align: center;
+    }
+    
+    .navigation button {
+      margin: 0 10px;
+      padding: 8px 16px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      outline: none;
+    }
+    
+    .navigation button:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
@@ -42,11 +63,55 @@
   <div id="loading-message" class="loading">
     <p>Loading...</p>
   </div>
+  <div class="navigation">
+    <button id="prevBtn">Previous</button>
+    <button id="nextBtn">Next</button>
+  </div>
   
   <script>
     const productList = document.getElementById('product-list');
     const errorMessage = document.getElementById('error-message');
     const loadingMessage = document.getElementById('loading-message');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let products = []; // Array to store products data
+    let currentIndex = 0; // Index to track current product
+
+    // Function to display current product
+    function displayProduct(index) {
+      const product = products[index];
+      if (product) {
+        // Clear previous product list
+        productList.innerHTML = '';
+
+        // Display current product
+        const productElement = document.createElement('div');
+        productElement.classList.add('product');
+
+        // Product name
+        const nameElement = document.createElement('h2');
+        nameElement.textContent = product.name;
+        productElement.appendChild(nameElement);
+
+        // Product image
+        const imageElement = document.createElement('img');
+        imageElement.src = product.image;
+        imageElement.alt = product.name;
+        productElement.appendChild(imageElement);
+
+        // Product price
+        const priceElement = document.createElement('p');
+        priceElement.textContent = `Price: $${product.price}`;
+        productElement.appendChild(priceElement);
+
+        // Product description
+        const descriptionElement = document.createElement('p');
+        descriptionElement.textContent = product.description;
+        productElement.appendChild(descriptionElement);
+
+        productList.appendChild(productElement);
+      }
+    }
 
     // Fetch data from API endpoint
     fetch('https://course-api.com/react-store-products')
@@ -61,40 +126,26 @@
         loadingMessage.style.display = 'none';
         // Show product list
         productList.style.display = 'block';
-        
-        // Clear error message if data successfully fetched
-        errorMessage.style.display = 'none';
-        
-        // Display each product
-        data.forEach(product => {
-          const productElement = document.createElement('div');
-          productElement.classList.add('product');
+        // Store products data
+        products = data;
+        // Display initial product
+        displayProduct(currentIndex);
 
-          // Product name
-          const nameElement = document.createElement('h2');
-          nameElement.textContent = product.name;
-          productElement.appendChild(nameElement);
-
-          // Product image
-          const imageElement = document.createElement('img');
-          imageElement.src = product.image;
-          imageElement.alt = product.name;
-          productElement.appendChild(imageElement);
-
-          // Product price
-          const priceElement = document.createElement('p');
-          priceElement.textContent = `Price: $${product.price}`;
-          productElement.appendChild(priceElement);
-
-          // Product description
-          const descriptionElement = document.createElement('p');
-          descriptionElement.textContent = product.description;
-          productElement.appendChild(descriptionElement);
-
-          productList.appendChild(productElement);
+        // Event listener for previous button
+        prevBtn.addEventListener('click', () => {
+          currentIndex = (currentIndex - 1 + products.length) % products.length;
+          displayProduct(currentIndex);
         });
-      });
+
+        // Event listener for next button
+        nextBtn.addEventListener('click', () => {
+          currentIndex = (currentIndex + 1) % products.length;
+          displayProduct(currentIndex);
+        });
+      })
       .catch(error => {
+        // Hide loading message
+        loadingMessage.style.display = 'none';
         // Display error message
         console.error('Error fetching product data:', error);
         errorMessage.style.display = 'block';
