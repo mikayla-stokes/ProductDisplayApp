@@ -25,15 +25,28 @@
       font-weight: bold;
     }
 
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .loading p {
+      font-size: 24px;
+    }
   </style>
 </head>
 <body>
   <div id="product-list"></div>
   <div id="error-message" class="error" style="display: none;">Failed to load product data.</div>
-
+  <div id="loading-message" class="loading">
+    <p>Loading...</p>
+  </div>
+  
   <script>
     const productList = document.getElementById('product-list');
     const errorMessage = document.getElementById('error-message');
+    const loadingMessage = document.getElementById('loading-message');
 
     // Fetch data from API endpoint
     fetch('https://course-api.com/react-store-products')
@@ -44,6 +57,11 @@
         return response.json();
       })
       .then(data => {
+        // Hide loading message
+        loadingMessage.style.display = 'none';
+        // Show product list
+        productList.style.display = 'block';
+        
         // Clear error message if data successfully fetched
         errorMessage.style.display = 'none';
         
